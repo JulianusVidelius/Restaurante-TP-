@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/estilosAdminPanel.css">
+    <title>Panel de Admin</title>
+</head>
+<body>
+    <header class="d-flex justify-content-between align-items-center p-3 bg-dark text-white">
+        <div>
+            <button id="iniciarSesionAdminBtn" class="btn btn-primary" onclick="location.href='../login_admin.html'">Iniciar Sesión Admin</button>
+            <button id="cerrarSesionBtn" class="btn btn-danger" style="display:none;" onclick="cerrarSesion()">Cerrar Sesión</button>
+        </div>
+        <div>
+            <img src="../img/comidas/logoRestaurant.png" height="150px" width="120px" alt="Logo" class="logo">
+        </div>
+        <div>
+            <button class="btn btn-info" onclick="mostrarReporte()">Ver Reporte de Pedidos</button>
+        </div>
+    </header>
+
+    <div class="container mt-5">
+        <h1 class="panel text-success">Panel de Administración</h1>
+        <input type="text" id="filtroUsuario" class="lol" placeholder="Buscar pedidos de usuario con nombre o ID" oninput="buscarUsuario()">
+        <div id="pedidos"></div>
+
+    <!-- Sección para agregar o eliminar productos -->
+    <div id="gestionarProductos">
+        <h2>Gestión de Productos</h2>
+        
+        <!-- Formulario para agregar producto -->
+        <form action="agregar_producto.php" method="POST" enctype="multipart/form-data">
+            <h3>Agregar Producto</h3>
+            <label for="nombre">Nombre del Producto:</label>
+            <input type="text" id="nombre" name="nombre" required>
+    
+            <label for="precio">Precio:</label>
+            <input type="number" id="precio" name="precio" step="0.01" required>
+
+            <div class="form-group">
+                <label for="categoria">Categoría:</label>
+                <select id="categoria" name="categoria" class="custom-select" required>
+                    <option value="Plato principal">Plato principal</option>
+                    <option value="Entrada">Entrada</option>
+                    <option value="Postre">Postre</option>
+                </select>
+    
+            <label for="descripcion">Descripción:</label>
+            <textarea id="descripcion" name="descripcion" required></textarea>
+    
+            <label for="imagen">Imagen del Producto:</label>
+            <input type="file" id="imagen" name="imagen" accept="image/*" required>
+    
+            <button type="submit">Agregar Producto</button>
+        </form>
+
+
+    <div id="modificarProducto">
+        <h3>Modificar Producto</h3>
+        <label for="id_producto_modificar">Seleccionar Producto:</label>
+        <select id="id_producto_modificar" onchange="cargarDatosProducto()">
+            <option value="">Selecciona un producto</option>
+            <!-- Opciones se llenarán dinámicamente -->
+        </select>
+
+        <label for="nombre_modificar">Nombre del Producto:</label>
+        <input type="text" id="nombre_modificar">
+
+        <label for="precio_modificar">Precio:</label>
+        <input type="number" id="precio_modificar" step="0.01">
+
+        <label for="descripcion_modificar">Descripción:</label>
+        <textarea id="descripcion_modificar"></textarea>
+
+        <button onclick="guardarCambios()">Guardar Cambios</button>
+    </div>
+    
+    <!-- Formulario para eliminar producto -->
+    <form action="eliminar_producto.php" method="POST">
+        <h3>Eliminar Producto</h3>
+        <label for="id_producto">ID del Producto a Eliminar:</label>
+        <input type="number" id="id_producto" name="id_producto" required>
+        <button type="submit">Eliminar Producto</button>
+    </form>
+</div>
+    
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <span class="close" onclick="cerrarModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <pre id="modalMessage"></pre>
+            </div>
+            <div class="modal-footer">
+                <button onclick="cerrarModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+            fetch('verificarSesionAdmin.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.sesionIniciada) {
+                    document.getElementById('iniciarSesionAdminBtn').style.display = 'none';
+                    document.getElementById('cerrarSesionBtn').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        function mostrarReporte() {
+            fetch('obtenerReporte.php')
+            .then(response => response.json())
+            .then(data => {
+                const mensaje = `
+                    Total de pedidos: ${data.total}
+                    Pedidos pendientes: ${data.pendientes}
+                    Pedidos entregados: ${data.entregados}
+                `;
+                alert(mensaje);
+            })
+            .catch(error => {
+                console.error('Error al obtener el reporte:', error);
+                alert('Hubo un error al obtener el reporte.');
+            });
+        }
+
+        function buscarUsuario() {
+            const filtro = document.getElementById('filtroUsuario').value.trim();
+            if (!filtro) {
+                document.getElementById('pedidos').innerHTML = '';
+                return;
+            }
+
+            fetch(`buscarPedidos.php?query=${encodeURIComponent(filtro)}`)
+            .then(response => response.json())
+            .then(data => {
+                const pedidosDiv = document.getElementById('pedidos');
+                pedidosDiv.innerHTML = '';
+
+                if (data.error) {
+                    pedidosDiv.innerHTML = `<p>${data.error}</p>`;
+                    return;
+                }
+
+                if (data.pedidos.length === 0) {
+                    pedidosDiv.innerHTML = '<p>Este usuario no ha realizado pedidos.</p>';
+                } else {
+                    data.pedidos.forEach((pedido) => {
+                        const pedidoDiv = document.createElement('div');
+                        pedidoDiv.innerHTML = `
+                            <p>Usuario: ${pedido.usuario}</p>
+                            <p>Pedido ${pedido.id}: ${pedido.productos}</p>
+                            <button onclick="eliminarPedido(${pedido.id})">Eliminar</button>
+                            <button onclick="marcarEntregado(${pedido.id})">Marcar como Entregado</button>
+                            <button onclick="editarPedido(${pedido.id})">Editar Pedido</button>
+                        `;
+                        pedidosDiv.appendChild(pedidoDiv);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarProductos(); // Cargar productos al iniciar la página
+        });
+
+        function cargarProductos() {
+            fetch('listarProductos.php')
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('id_producto_modificar');
+                select.innerHTML = '<option value="">Selecciona un producto</option>';
+
+                data.productos.forEach(producto => {
+                    const option = document.createElement('option');
+                    option.value = producto.id;
+                    option.textContent = producto.nombre;
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function cargarDatosProducto() {
+            const id = document.getElementById('id_producto_modificar').value;
+            if (!id) return;
+
+            fetch(`listarProductos.php?id=${id}`)
+            .then(response => response.json())
+            .then(producto => {
+                document.getElementById('nombre_modificar').value = producto.nombre;
+                document.getElementById('precio_modificar').value = producto.precio;
+                document.getElementById('descripcion_modificar').value = producto.descripcion;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function guardarCambios() {
+            const id = document.getElementById('id_producto_modificar').value;
+            const nombre = document.getElementById('nombre_modificar').value;
+            const precio = document.getElementById('precio_modificar').value;
+            const descripcion = document.getElementById('descripcion_modificar').value;
+
+            fetch('modificar_producto.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `id=${id}&nombre=${encodeURIComponent(nombre)}&precio=${precio}&descripcion=${encodeURIComponent(descripcion)}`
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                cargarProductos();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function eliminarPedido(id) {
+            fetch('adminEliminarPedido.php?id=' + id)
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                buscarUsuario(); // Refresca la búsqueda actual después de eliminar
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function marcarEntregado(id) {
+            fetch('adminMarcarEntregado.php?id=' + id)
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                buscarUsuario(); // Refresca la búsqueda actual después de marcar como entregado
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function editarPedido(id) {
+            const nuevosDatos = prompt('Introduce los nuevos datos del pedido en formato JSON ({"productos": [...]})');
+            if (!nuevosDatos) return;
+
+            fetch(`adminEditarPedido.php?id=${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: nuevosDatos
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                buscarUsuario(); // Refresca la búsqueda actual después de editar
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function cerrarSesion() {
+            fetch('cerrarSesion.php')
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                location.href = '../login_admin.html';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>

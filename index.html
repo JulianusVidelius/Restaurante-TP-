@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/formStyles.css">
+    <title>Registro de Usuarios</title>
+</head>
+<body class="bg-gradient-primary">
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="login-container p-5 rounded shadow-lg bg-white">
+            <div class="login-avatar text-center mb-4">
+                <img src="img/avatar.png" alt="Avatar" class="rounded-circle" width="100">
+            </div>
+            <h1 class="text-center mb-4">Registro de Usuarios</h1>
+            <form action="php/guardarRegistro.php" method="POST">
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="apellidos">Apellidos:</label>
+                    <input type="text" id="apellidos" name="apellidos" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contacto">Correo electrónico:</label>
+                    <input type="email" id="contacto" name="contacto" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="usuario">Nombre de Usuario:</label>
+                    <input type="text" id="usuario" name="usuario" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contrasena">Contraseña:</label>
+                    <input type="password" id="contrasena" name="contrasena" class="form-control" required>
+                </div>
+                
+                <div class="form-group text-center">
+                    <p>¿Ya tienes cuenta? <a href="login.html">Iniciar Sesión</a></p>
+                </div>
+                
+                <button type="submit" class="btn btn-success btn-block">Registrar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

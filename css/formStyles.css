@@ -1,0 +1,49 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #6a11cb, #2575fc); /* Fondo con gradiente */
+    margin: 0;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(to right, #6a11cb, #2575fc); /* Fondo con gradiente */
+}
+
+.login-container {
+    width: 360px; /* Tamaño del formulario */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+
+.form-group label {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+form .form-control {
+    font-size: 16px;
+    border-radius: 5px;
+    padding: 12px;
+}
+
+button {
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+.login-avatar img {
+    background-color: #00a5bd;
+    padding: 10px;
+}

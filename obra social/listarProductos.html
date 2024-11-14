@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/estilosObraSocial.css">
+    <title>Planes de Salud</title>
+</head>
+<body>
+  
+    <header class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#"><img src="../img/logoObraSocial.png" height="50" alt="Logo Obra Social"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Planes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Beneficios</a>
+                </li>
+                <li class="nav-item">
+                    <button id="sessionBtn" onclick="handleSession()" class="btn btn-outline-light">Iniciar Sesión</button>
+                </li>
+            </ul>
+        </div>
+    </header>
+    
+    <!-- Encabezado principal -->
+    <section class="container mt-5">
+        <h1 class="text-center">Nuestros Planes de Salud</h1>
+        <p class="text-center text-secondary">Encuentra el plan ideal para cuidar tu salud y la de tus seres queridos.</p>
+    </section>
+
+    <!-- Selección de tipo de plan -->
+    <div class="container my-4">
+        <label for="categoriaSelect" class="selecCat">Filtrar por tipo de plan:</label>
+        <select id="categoriaSelect" onchange="filtrarPorCategoria()" class="form-control w-50 mx-auto">
+            <option value="todos">Todos</option>
+            <option value="Básico">Básico</option>
+            <option value="Intermedio">Intermedio</option>
+            <option value="Premium">Premium</option>
+        </select>
+    </div>
+
+    <!-- Listado de planes de salud -->
+    <div id="planes" class="container d-flex flex-wrap justify-content-center">
+        <!-- Los planes se cargarán aquí dinámicamente -->
+    </div>
+
+    <!-- Script principal -->
+    <script>
+        let planes = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Carga los planes al cargar la página
+            fetch('cargar_planes.php')
+                .then(response => response.json())
+                .then(data => {
+                    planes = data;
+                    mostrarPlanes(planes);
+                });
+        });
+
+        function mostrarPlanes(listaPlanes) {
+            const planesDiv = document.getElementById('planes');
+            planesDiv.innerHTML = '';
+
+            listaPlanes.forEach(plan => {
+                const planCard = document.createElement('div');
+                planCard.classList.add('card', 'm-3', 'p-2', 'shadow');
+                planCard.style.width = '18rem';
+                planCard.innerHTML = `
+                    <img src="../img/${plan.imagen}" class="card-img-top" alt="${plan.nombre}">
+                    <div class="card-body">
+                        <h5 class="card-title">${plan.nombre}</h5>
+                        <p class="card-text">${plan.descripcion}</p>
+                        <p class="price text-primary font-weight-bold">Mensualidad: $${plan.precio}</p>
+                        <button onclick="seleccionarPlan('${plan.nombre}', ${plan.precio})" class="btn btn-primary">Seleccionar Plan</button>
+                    </div>
+                `;
+                planesDiv.appendChild(planCard);
+            });
+        }
+
+        function filtrarPorCategoria() {
+            const categoriaSeleccionada = document.getElementById('categoriaSelect').value;
+            let planesFiltrados;
+
+            if (categoriaSeleccionada === "todos") {
+                planesFiltrados = planes;
+            } else {
+                planesFiltrados = planes.filter(plan => plan.categoria === categoriaSeleccionada);
+            }
+
+            mostrarPlanes(planesFiltrados);
+        }
+
+        function seleccionarPlan(nombre, precio) {
+            alert(`Has seleccionado el plan ${nombre} con un precio mensual de $${precio}.`);
+        }
+
+        function handleSession() {
+            fetch('verificarSesion.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.sesionIniciada) {
+                    cerrarSesion();
+                } else {
+                    window.location.href = '../login.html';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function cerrarSesion() {
+            fetch('cerrarSesion.php')
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                document.getElementById('sessionBtn').innerText = 'Iniciar Sesión';
+                window.location.href = 'listarPlanes.html';
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('verificarSesion.php')
+            .then(response => response.json())
+            .then(data => {
+                const sessionBtn = document.getElementById('sessionBtn');
+                if (data.sesionIniciada) {
+                    sessionBtn.innerText = 'Cerrar Sesión';
+                    sessionBtn.classList.replace('btn-success', 'btn-danger');
+                } else {
+                    sessionBtn.innerText = 'Iniciar Sesión';
+                    sessionBtn.classList.replace('btn-danger', 'btn-success');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+
+    <!-- Pie de página -->
+    <footer class="bg-dark text-light pt-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 mb-4">
+                    <h5>Sobre Nosotros</h5>
+                    <p>Somos una obra social comprometida en ofrecer atención de calidad para todos nuestros afiliados.</p>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Enlaces Rápidos</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-light">Inicio</a></li>
+                        <li><a href="#" class="text-light">Planes</a></li>
+                        <li><a href="#" class="text-light">Servicios</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Contacto</h5>
+                    <p><strong>Teléfono:</strong> +123 456 789</p>
+                    <p><strong>Email:</strong> atencion@obrasocial.com</p>
+                    <p><strong>Dirección:</strong> Calle Salud 123, Ciudad</p>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Síguenos</h5>
+                    <div class="d-flex">
+                        <a href="#" class="mr-3"><img src="../img/facebook-icon.png" alt="Facebook" width="30"></a>
+                        <a href="#" class="mr-3"><img src="../img/instagram-icon.png" alt="Instagram" width="30"></a>
+                        <a href="#"><img src="../img/x-logo.png" alt="Twitter" width="30"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center py-3">
+                <small>&copy; 2024 Obra Social. Todos los derechos reservados.</small>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

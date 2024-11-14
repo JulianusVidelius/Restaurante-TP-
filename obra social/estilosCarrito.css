@@ -1,0 +1,69 @@
+/* Ajuste de color de fondo y fuente */
+body {
+    background-color: #f8f9fa;
+    color: #343a40;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    color: #007bff;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Header */
+header {
+    background-color: #007bff;
+    color: white;
+    padding: 15px 20px;
+}
+
+header button {
+    background-color: #28a745;
+}
+
+header .logo {
+    width: auto;
+    height: 4rem;
+}
+
+/* Footer */
+footer {
+    background-color: #343a40;
+    color: #fff;
+    padding: 20px;
+}
+
+.footer-section h3 {
+    color: #28a745;
+}
+
+.footer-section ul li a:hover {
+    color: #28a745;
+}
+
+/* Estilo de botón */
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Tarjetas de planes de salud */
+.product-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+}
+
+.product-card .price {
+    color: #28a745;
+}
