@@ -29,10 +29,6 @@ Asegúrate de tener instalados los siguientes programas en tu sistema:
 - PHP
 - MySQL
 
-<<<<<<< HEAD
-
-=======
-
 
 ## Créditos
 Hecho por Julián Vidal, Pablo Almada e Ivo Mignone.
